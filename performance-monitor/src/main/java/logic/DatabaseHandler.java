@@ -1,14 +1,23 @@
 package logic;
 
 import java.sql.*;
+import java.nio.file.*;
 
 public class DatabaseHandler {
     private Connection connection;
 
     public DatabaseHandler() {
         try {
+            // 获取用户目录下的专用文件夹
+            String userHome = System.getProperty("user.home");
+            String appDir = userHome + "/PerformanceMonitor";
+            Path dbPath = Paths.get(appDir, "performance.db");
+            
+            // 确保目录存在
+            Files.createDirectories(dbPath.getParent());
+            
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:performance.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
             createTable();
         } catch (Exception e) {
             System.err.println("数据库连接失败: " + e.getMessage());
@@ -55,5 +64,10 @@ public class DatabaseHandler {
         } catch (SQLException e) {
             System.err.println("关闭数据库连接失败: " + e.getMessage());
         }
+    }
+    
+    public static String getDatabasePath() {
+        String userHome = System.getProperty("user.home");
+        return Paths.get(userHome, "PerformanceMonitor", "performance.db").toString();
     }
 }

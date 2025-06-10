@@ -1,6 +1,7 @@
 package ui;
 
 import javafx.scene.image.Image;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,21 +32,30 @@ public class BrandLogoManager {
     public Image getBrandLogo(String brand) {
         if (LOGO_CACHE.containsKey(brand))
             return LOGO_CACHE.get(brand);
-        String imagePath = "/img/" + brand + "_logo.png";
-        Image logo = null;
+        
         try {
-            logo = new Image(getClass().getResourceAsStream(imagePath));
-            if (logo.isError() || logo.getWidth() <= 0)
-                throw new Exception();
-        } catch (Exception e) {
-            System.err.println("无法加载品牌Logo: " + brand + ", 使用默认Logo");
-        }
-        if (logo == null || logo.isError() || logo.getWidth() <= 0) {
-            logo = new Image(getClass().getResourceAsStream("/img/default_logo.png"));
-            LOGO_CACHE.put("default", logo);
+            // 使用URL加载资源，确保在打包后也能正确访问
+            URL resourceUrl = getClass().getResource("/img/" + brand + "_logo.png");
+            if (resourceUrl == null) {
+                throw new Exception("品牌Logo资源未找到: " + brand);
+            }
+            
+            Image logo = new Image(resourceUrl.toExternalForm());
+            LOGO_CACHE.put(brand, logo);
             return logo;
+        } catch (Exception e) {
+            System.err.println("无法加载品牌Logo: " + brand + ", 使用默认Logo. 错误: " + e.getMessage());
+            
+            // 加载默认logo
+            URL defaultUrl = getClass().getResource("/img/default_logo.png");
+            if (defaultUrl != null) {
+                Image defaultLogo = new Image(defaultUrl.toExternalForm());
+                LOGO_CACHE.put("default", defaultLogo);
+                return defaultLogo;
+            } else {
+                System.err.println("严重错误: 默认Logo也未找到!");
+                return null;
+            }
         }
-        LOGO_CACHE.put(brand, logo);
-        return logo;
     }
 }

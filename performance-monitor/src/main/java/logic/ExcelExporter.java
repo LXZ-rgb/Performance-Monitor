@@ -8,8 +8,8 @@ import java.sql.*;
 
 public class ExcelExporter {
     public static void exportAbnormalData(String filePath) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:performance.db");
-                Workbook workbook = new XSSFWorkbook()) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DatabaseHandler.getDatabasePath());
+             Workbook workbook = new XSSFWorkbook()) {
 
             Sheet sheet = workbook.createSheet("性能异常数据");
             // 表头样式
@@ -28,7 +28,7 @@ public class ExcelExporter {
             // 查询并写入数据
             String sql = "SELECT * FROM performance_data";
             try (Statement stmt = conn.createStatement();
-                    ResultSet rs = stmt.executeQuery(sql)) {
+                 ResultSet rs = stmt.executeQuery(sql)) {
                 int rowNum = 1;
                 while (rs.next()) {
                     Row row = sheet.createRow(rowNum++);
