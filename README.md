@@ -1,18 +1,24 @@
-## Getting Started
+# 电脑性能监视器 (Hardware Performance Monitor)
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+![品牌识别](https://img.shields.io/badge/功能-品牌识别-green)
+![资源缓存](https://img.shields.io/badge/优化-图片缓存-blue)
 
-## Folder Structure
+## 功能特性更新
+- 🏷️ **智能品牌识别**：
+  - 根据硬件型号关键字自动匹配品牌
+  - 支持Intel/AMD/Samsung/WD/Seagate/Kingston等主流品牌
+- 🖼️ **动态Logo加载**：
+  - 自动加载匹配的品牌Logo
+  - 内置缓存机制提升性能
+  - 优雅的失败处理（默认Logo）
 
-The workspace contains two folders by default, where:
-
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+## 资源管理系统
+### 品牌识别逻辑
+```java
+// 品牌关键字映射
+private static final Map<String, String> BRAND_MAPPING = new HashMap<>();
+static {
+    BRAND_MAPPING.put("intel", "intel");
+    BRAND_MAPPING.put("amd", "amd");
+    // 更多品牌...
+}
