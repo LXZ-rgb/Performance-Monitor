@@ -1,100 +1,100 @@
-# Performance Monitor 团队博客与源码介绍
+# 💻 电脑性能监视器 (Hardware Performance Monitor)
 
-## 项目简介
-
-**Performance Monitor** 是一个专为开发者和团队打造的性能监控与展示平台。它支持性能数据采集、数据库管理、Excel 报表导出等功能，并配有美观直观的桌面端博客展示界面，便于团队成员分享技术文章、经验总结及源码解析。
-
----
-
-## 博客特色
-
-- 专属团队博客平台，可撰写、展示团队成员的技术文章
-- 支持性能数据的可视化与存档
-- 一键导出数据到 Excel
-- 内置源代码解析与模块介绍，帮助新成员快速上手
+<div align="center">
+  <img src="https://img.shields.io/badge/功能-品牌识别-green?style=for-the-badge" alt="品牌识别"/>
+  <img src="https://img.shields.io/badge/优化-图片缓存-blue?style=for-the-badge" alt="资源缓存"/>
+  <img src="https://img.shields.io/badge/平台-Windows%20/%20macOS%20/%20Linux-1976d2?style=for-the-badge" alt="平台"/>
+</div>
 
 ---
 
-## 运行环境与依赖
+<div align="center">
 
-- Java 8 及以上
-- 推荐使用 IDE（如 IntelliJ IDEA、Eclipse）打开
-- 依赖项（如有）：JavaFX 或 Swing（请根据 `MainApp.java` 具体实现补充）
+<img src="https://img.shields.io/github/stars/LXZ-rgb/Performance-Monitor?style=social" alt="GitHub stars" />  
+<br/>
+<b>一款面向开发者与团队的跨平台性能监视和数据可视化工具</b>
+</div>
 
 ---
 
-## 目录结构
+## 🚀 功能特性
 
-```plaintext
-Performance_monitor/
-├── src/
-│   └── main/
-│       └── java/
-│           ├── logic/
-│           │   ├── DatabaseHandler.java      // 数据库操作
-│           │   ├── ExcelExporter.java        // Excel 导出
-│           │   └── PerformanceData.java      // 性能数据模型
-│           └── ui/
-│               ├── BrandLogoManager.java     // 品牌 Logo 管理
-│               ├── MainApp.java              // 应用入口
-│               └── MainController.java       // 主界面控制器
-├── icons/                                     // 应用图标
-└── ...                                        // 其他资源与配置
+- 🏷️ <b>智能品牌识别：</b>
+  - 根据硬件型号关键字自动匹配品牌
+  - 支持 Intel / AMD / Samsung / WD / Seagate / Kingston 等主流品牌
+- 🖼️ <b>动态 Logo 加载：</b>
+  - 自动加载匹配的品牌 Logo
+  - 内置缓存机制提升性能
+  - 优雅的失败处理（默认 Logo）
+- 📈 <b>数据可视化与异常监控：</b>
+  - 实时折线图展示 CPU / 内存 / 磁盘 / 温度等信息
+  - 一键导出异常数据报表（Excel）
+- 🔒 <b>本地数据存储：</b>
+  - 自动在用户目录建立数据库，无需手动配置
+  - 所有数据私有化安全存储
+
+---
+
+## 🏗️ 技术栈
+
+- Java 8+
+- JavaFX（桌面 UI）
+- OSHI（硬件信息采集）
+- SQLite（本地数据库）
+- Apache POI（Excel 导出）
+
+---
+
+## 🗂️ 资源管理系统
+
+### 品牌识别逻辑
+
+```java
+// 品牌关键字映射
+private static final Map<String, String> BRAND_MAPPING = new HashMap<>();
+static {
+    BRAND_MAPPING.put("intel", "intel");
+    BRAND_MAPPING.put("amd", "amd");
+    BRAND_MAPPING.put("samsung", "samsung");
+    BRAND_MAPPING.put("western digital", "wd");
+    BRAND_MAPPING.put("seagate", "seagate");
+    BRAND_MAPPING.put("kingston", "kingston");
+    // 更多品牌...
+}
 ```
 
 ---
 
-## 启动方式
+## 🌟 快速开始
 
-1. 克隆仓库并解压源码
-2. 用 IDE 导入项目（选择 `src/main/java` 目录为源码根目录）
-3. 配置运行主类为 `ui.MainApp`
-4. 运行即可访问团队博客及性能监控功能
-
----
-
-## 源代码介绍（博客界面内展示示例）
-
-在博客主界面会有【源代码介绍】板块，内容例如：
-
-> ### 源代码功能结构
->
-> - **逻辑层（logic）**  
->   - `DatabaseHandler`：负责与数据库连接、数据的增删查改  
->   - `ExcelExporter`：将性能数据导出为 Excel，方便团队归档与分析  
->   - `PerformanceData`：性能数据的模型与封装
->
-> - **界面层（ui）**  
->   - `MainApp`：应用程序入口，初始化界面
->   - `MainController`：主界面逻辑与事件处理
->   - `BrandLogoManager`：品牌 Logo 的加载与管理
->
-> - **资源与配置**  
->   - `icons/`：应用图标
->
-> ### 技术栈
-> - 纯 Java 实现
-> - UI 框架：JavaFX 或 Swing（根据 MainApp 代码实际情况填写）
-> - 数据持久化：本地数据库（如 SQLite，详见 DatabaseHandler）
-> - 支持数据导出、团队博客文章管理
+1. **克隆仓库**
+   ```bash
+   git clone https://github.com/LXZ-rgb/Performance-Monitor.git
+   ```
+2. **导入到 IDE**（如 IntelliJ IDEA、Eclipse）
+3. **运行主类**  
+   `ui.MainApp`
+4. **体验高效性能监视与可视化！**
 
 ---
 
-## FAQ
+## 📚 项目文档与扩展
 
-- **如何添加新博客？**  
-  在博客主界面点击“新建文章”，填写内容并保存即可。
-- **如何导出性能数据？**  
-  在性能监控界面点击“导出为 Excel”按钮。
-- **遇到依赖或启动报错？**  
-  请确认已安装 Java 8+，并正确配置了 UI 相关依赖。
+- [团队博客](https://lxz-rgb.github.io/Performance-Monitor/)
+- [项目源码与结构介绍](docs/code.md)
+- [团队介绍](docs/about.md)
 
 ---
 
-## 联系方式
+## 💬 反馈与交流
 
-如需交流或反馈建议，请通过 [GitHub Issues](https://github.com/LXZ-rgb/Performance-Monitor/issues) 联系我们。
+- [提交 Issue](https://github.com/LXZ-rgb/Performance-Monitor/issues)
+- 邮箱：lxz-rgb@proton.me
 
 ---
 
-> 欢迎 Star & Fork 本项目，贡献你的力量！
+<div align="center" style="margin-top:2em;">
+  <img src="https://img.shields.io/badge/欢迎Star和贡献-blueviolet?style=for-the-badge" height="32" alt="欢迎Star" />  
+  <br/>
+  <em>让性能可见，让成长同行。</em>
+</div>
