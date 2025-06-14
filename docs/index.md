@@ -3,20 +3,39 @@ layout: home
 title: 团队博客首页
 ---
 
-欢迎访问 **Performance Monitor** 团队博客！
+<div align="center">
 
-本博客记录了我们团队在开发性能监控系统中的点滴成长，也会持续分享技术心得与项目经验。
+<img src="https://img.shields.io/badge/团队-Performance%20Monitor-1976d2?style=for-the-badge&logo=data:image/png;base64,iVBORw0KGgo=" height="30" alt="团队Logo" />
 
----
+# 🎉 欢迎访问 <span style="color:#1976d2;">Performance Monitor</span> 团队博客！
 
-## 📌 项目简介
-
-Performance Monitor 是一个采用 Java 实现的性能监控与团队博客系统，支持性能数据采集、报表导出和团队知识沉淀。欢迎浏览我们的[项目源码](code.md)。
+</div>
 
 ---
 
-- [团队介绍](about.md)
-- [最新文章](/Performance-Monitor/)
-- [项目源码与结构介绍](code.md)
+## 🚀 关于我们
+
+Performance Monitor 团队致力于为开发者打造专业的性能监视与数据可视化工具。我们在这里记录成长、分享经验、交流技术，也欢迎你的加入和建议！
 
 ---
+
+## 📚 快捷导航
+
+- 👥 [团队介绍](about.md)
+- 📝 [最新文章](/Performance-Monitor/)
+- 💻 [项目源码与结构](code.md)
+- ⭐ [GitHub 仓库](https://github.com/LXZ-rgb/Performance-Monitor)
+
+---
+
+## 📰 最新公告
+
+> <span style="color:#1976d2">2025-06-14</span> ：Performance Monitor 团队博客上线，欢迎大家投稿、评论与 Star！
+
+---
+
+<div align="center" style="margin-top:2em;">
+  <img src="https://img.shields.io/github/stars/LXZ-rgb/Performance-Monitor?style=social" alt="GitHub stars" />  
+  <br/>
+  <em>—— 让性能可见，让成长同行 ——</em>
+</div>
