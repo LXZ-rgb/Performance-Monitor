@@ -1,9 +1,0 @@
-title: Performance Monitor 团队博客
-description: 记录团队开发与成长的点滴
-theme: minima
-baseurl: "/Performance-Monitor"
-url: "https://lxz-rgb.github.io"
-markdown: kramdown
-plugins:
-  - jekyll-feed
-  - jekyll-seo-tag
