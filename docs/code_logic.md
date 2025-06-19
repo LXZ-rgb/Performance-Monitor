@@ -29,9 +29,7 @@ title: logic 包源码与结构详解
 
 > **作用说明**：管理 SQLite 数据库连接、建表、数据存储与关闭。所有性能异常数据均由此管理持久化。
 
-```java
-// 源码见上方“DatabaseHandler.java”
-```
+
 
 ---
 
@@ -39,58 +37,37 @@ title: logic 包源码与结构详解
 
 > **作用说明**：基于 OSHI 库采集 CPU、内存、磁盘等实时数据，并决定是否需要持久化异常。
 
-```java
-// 源码见上方“HardwareMonitor.java”
-```
+
 
 ---
 
 ## 其它文件（以同样方式展开）
 
 ### ExcelExporter.java
-```java
-// 源码见上方“ExcelExporter.java”
-```
+
 
 ### PerformanceData.java
-```java
-// 源码见上方“PerformanceData.java”
-```
+
 
 ### StatisticsManager.java
-```java
-// 源码见上方“StatisticsManager.java”
-```
+
 
 ### PerformanceSimulator.java
-```java
-// 源码见上方“PerformanceSimulator.java”
-```
+
 
 ### LogHelper.java
-```java
-// 源码见上方“LogHelper.java”
-```
+
 
 ### CpuInfoParser.java
-```java
-// 源码见上方“CpuInfoParser.java”
-```
+
 
 ### FileUtils.java
-```java
-// 源码见上方“FileUtils.java”
-```
+
 
 ### StringUtils.java
-```java
-// 源码见上方“StringUtils.java”
-```
+
 
 ---
-
-如需补全更多源码或按上述格式整理全部 logic 文件，请继续“查看更多”并补充每个 Java 文件内容即可。
-
 ---
 
 <div align="center" style="margin-top:2em;">
