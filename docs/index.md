@@ -22,7 +22,6 @@ Performance Monitor 团队致力于为开发者打造专业的性能监视与数
 ## 📚 快捷导航
 
 - 👥 [团队介绍](about.md)
-- 📝 [最新文章](/Performance-Monitor/)
 - 💻 [项目源码与结构](code.md)
 - ⭐ [GitHub 仓库](https://github.com/LXZ-rgb/Performance-Monitor)
 
