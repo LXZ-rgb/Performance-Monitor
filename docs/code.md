@@ -3,7 +3,7 @@ layout: page
 title: 项目源码与结构介绍
 ---
 
-# 🌟 项目源码与结构详细注释（含FXML布局）
+# 🌟 项目所有 Java 源码完整展示与逐行注释
 
 <div align="center">
   <img src="https://img.shields.io/badge/Java-PerformanceMonitor-blue?logo=java" alt="Java">
@@ -11,28 +11,22 @@ title: 项目源码与结构介绍
   <img src="https://img.shields.io/badge/开源-GitHub-brightgreen" alt="GitHub">
 </div>
 
-> 本文档完整展示 Performance Monitor 项目的全部核心源码及其详细中文注释，并包含 FXML 界面布局说明和注释。适合答辩、复习和参考。
+<br/>
+
+> 本页面完整展示 Performance Monitor 项目 `performance-monitor/src/main/java` 目录下所有 Java 源码（含中文注释和模块说明），便于学习与答辩使用。
 
 ---
 
 ## 目录
 
-- [一、数据层（logic 包）](#一数据层logic-包)
-  - DatabaseHandler.java
-  - PerformanceData.java
-  - HardwareMonitor.java
-  - ExcelExporter.java
-- [二、界面与业务层（ui 包）](#二界面与业务层ui-包)
-  - MainApp.java
-  - MainController.java
-  - BrandLogoManager.java
-- [三、FXML 界面布局与注释](#三fxml-界面布局与注释)
+- [logic 包（数据、工具与业务逻辑）](#logic-包数据工具与业务逻辑)
+- [ui 包（界面与控制器）](#ui-包界面与控制器)
 
 ---
 
-## 一、数据层（logic 包）
+## logic 包（数据、工具与业务逻辑）
 
-### 1. DatabaseHandler.java
+### DatabaseHandler.java
 
 ```java
 package logic;
@@ -41,31 +35,22 @@ import java.sql.*;
 import java.nio.file.*;
 
 public class DatabaseHandler {
-    private Connection connection; // 数据库连接对象
+    private Connection connection;
 
     public DatabaseHandler() {
         try {
-            // 获取用户家目录
             String userHome = System.getProperty("user.home");
-            // 拼接应用文件夹路径
             String appDir = userHome + "/PerformanceMonitor";
-            // 拼接数据库文件路径
             Path dbPath = Paths.get(appDir, "performance.db");
-            // 创建数据库所在文件夹（如果不存在）
             Files.createDirectories(dbPath.getParent());
-            // 加载SQLite驱动
             Class.forName("org.sqlite.JDBC");
-            // 建立数据库连接
             connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
-            // 创建数据表（如不存在）
             createTable();
         } catch (Exception e) {
-            // 捕获并输出异常
             System.err.println("数据库连接失败: " + e.getMessage());
         }
     }
 
-    // 创建性能数据表
     private void createTable() {
         final String sql = """
                 CREATE TABLE IF NOT EXISTS performance_data (
@@ -78,28 +63,26 @@ public class DatabaseHandler {
                 )
                 """;
         try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql); // 执行建表语句
+            stmt.execute(sql);
         } catch (SQLException e) {
             System.err.println("创建表失败: " + e.getMessage());
         }
     }
 
-    // 保存一条性能数据
     public void savePerformanceData(PerformanceData data) {
         final String sql = "INSERT INTO performance_data (timestamp, cpu_usage, memory_usage, disk_usage, temperature) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, data.getTimestamp().toString()); // 时间戳
-            pstmt.setDouble(2, data.getCpuUsage());              // CPU使用率
-            pstmt.setDouble(3, data.getMemoryUsage());           // 内存使用率
-            pstmt.setDouble(4, data.getDiskUsage());             // 磁盘使用率
-            pstmt.setDouble(5, data.getTemperature());           // 温度
+            pstmt.setString(1, data.getTimestamp().toString());
+            pstmt.setDouble(2, data.getCpuUsage());
+            pstmt.setDouble(3, data.getMemoryUsage());
+            pstmt.setDouble(4, data.getDiskUsage());
+            pstmt.setDouble(5, data.getTemperature());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("保存数据失败: " + e.getMessage());
         }
     }
 
-    // 关闭数据库连接
     public void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
@@ -110,7 +93,6 @@ public class DatabaseHandler {
         }
     }
     
-    // 静态方法：获取数据库路径
     public static String getDatabasePath() {
         String userHome = System.getProperty("user.home");
         return Paths.get(userHome, "PerformanceMonitor", "performance.db").toString();
@@ -120,55 +102,7 @@ public class DatabaseHandler {
 
 ---
 
-### 2. PerformanceData.java
-
-```java
-package logic;
-
-import java.time.LocalDateTime;
-
-public class PerformanceData {
-    private final LocalDateTime timestamp;   // 采集时间
-    private final double cpuUsage;           // CPU使用率
-    private final double memoryUsage;        // 内存使用率
-    private final double diskUsage;          // 磁盘使用率
-    private final double temperature;        // 温度
-    private final boolean isAbnormal;        // 是否异常
-
-    public PerformanceData(LocalDateTime timestamp, double cpuUsage,
-            double memoryUsage, double diskUsage,
-            double temperature) {
-        this.timestamp = timestamp;
-        this.cpuUsage = cpuUsage;
-        this.memoryUsage = memoryUsage;
-        this.diskUsage = diskUsage;
-        this.temperature = temperature;
-        this.isAbnormal = checkAbnormal(); // 构造时自动判断是否异常
-    }
-
-    // 判断是否异常
-    private boolean checkAbnormal() {
-        final double CPU_THRESHOLD = 90.0;
-        final double MEMORY_THRESHOLD = 85.0;
-        final double DISK_THRESHOLD = 95.0;
-        return cpuUsage > CPU_THRESHOLD ||
-                memoryUsage > MEMORY_THRESHOLD ||
-                diskUsage > DISK_THRESHOLD;
-    }
-
-    // 各字段getter
-    public LocalDateTime getTimestamp() { return timestamp; }
-    public double getCpuUsage() { return cpuUsage; }
-    public double getMemoryUsage() { return memoryUsage; }
-    public double getDiskUsage() { return diskUsage; }
-    public double getTemperature() { return temperature; }
-    public boolean isAbnormal() { return isAbnormal; }
-}
-```
-
----
-
-### 3. HardwareMonitor.java
+### HardwareMonitor.java
 
 ```java
 package logic;
@@ -183,36 +117,33 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class HardwareMonitor {
-    // OSHI库获取系统硬件信息
     private final SystemInfo systemInfo = new SystemInfo();
     private final HardwareAbstractionLayer hardware = systemInfo.getHardware();
     private final CentralProcessor processor = hardware.getProcessor();
     private final GlobalMemory memory = hardware.getMemory();
 
-    private Timer monitoringTimer;              // 定时任务
-    private DatabaseHandler dbHandler;          // 数据库操作对象
-    private PerformanceData latestData;         // 最新数据
+    private Timer monitoringTimer;
+    private DatabaseHandler dbHandler;
+    private PerformanceData latestData;
 
     public HardwareMonitor() {
-        this.dbHandler = new DatabaseHandler(); // 初始化数据库
+        this.dbHandler = new DatabaseHandler();
     }
 
-    // 启动定时监控
     public void startMonitoring(int intervalSeconds) {
         monitoringTimer = new Timer();
         monitoringTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                PerformanceData data = collectPerformanceData(); // 采集性能数据
+                PerformanceData data = collectPerformanceData();
                 latestData = data;
-                if (data.isAbnormal()) { // 如果是异常数据则保存
+                if (data.isAbnormal()) {
                     dbHandler.savePerformanceData(data);
                 }
             }
-        }, 0, intervalSeconds * 1000L); // 设置采样周期
+        }, 0, intervalSeconds * 1000L);
     }
 
-    // 停止监控并关闭数据库连接
     public void stopMonitoring() {
         if (monitoringTimer != null) {
             monitoringTimer.cancel();
@@ -220,35 +151,31 @@ public class HardwareMonitor {
         dbHandler.closeConnection();
     }
 
-    // 获取最新采集数据，供UI实时刷新
     public PerformanceData getLatestData() {
         return latestData;
     }
 
-    // 采集性能数据
     private PerformanceData collectPerformanceData() {
-        double cpuUsage = processor.getSystemCpuLoad(1000) * 100; // CPU使用率
-        double memoryUsage = (memory.getTotal() - memory.getAvailable()) * 100.0 / memory.getTotal(); // 内存
+        double cpuUsage = processor.getSystemCpuLoad(1000) * 100;
+        double memoryUsage = (memory.getTotal() - memory.getAvailable()) * 100.0 / memory.getTotal();
         double diskUsage = 0;
         List<OSFileStore> fileStores = systemInfo.getOperatingSystem().getFileSystem().getFileStores();
         if (!fileStores.isEmpty()) {
             OSFileStore fs = fileStores.get(0);
-            diskUsage = (fs.getTotalSpace() - fs.getFreeSpace()) * 100.0 / fs.getTotalSpace(); // 磁盘
+            diskUsage = (fs.getTotalSpace() - fs.getFreeSpace()) * 100.0 / fs.getTotalSpace();
         }
-        double temperature = getCpuTemperature(); // CPU温度
+        double temperature = getCpuTemperature();
         return new PerformanceData(LocalDateTime.now(), cpuUsage, memoryUsage, diskUsage, temperature);
     }
 
-    // 获取CPU温度，如无则生成模拟值
     private double getCpuTemperature() {
         double temp = hardware.getSensors().getCpuTemperature();
         if (Double.isNaN(temp) || temp <= 0) {
-            return 40 + Math.random() * 20; // 随机模拟温度
+            return 40 + Math.random() * 20;
         }
         return temp;
     }
 
-    // 获取硬件信息（型号）
     public HardwareInfo getHardwareInfo() {
         String cpuModel = processor.getProcessorIdentifier().getName();
         String diskModel = "Unknown";
@@ -260,7 +187,6 @@ public class HardwareMonitor {
         return new HardwareInfo(cpuModel, diskModel, motherboardModel);
     }
 
-    // 内部类：硬件信息
     public static class HardwareInfo {
         public final String cpuModel;
         public final String diskModel;
@@ -277,7 +203,7 @@ public class HardwareMonitor {
 
 ---
 
-### 4. ExcelExporter.java
+### ExcelExporter.java
 
 ```java
 package logic;
@@ -294,13 +220,10 @@ public class ExcelExporter {
              Workbook workbook = new XSSFWorkbook()) {
 
             Sheet sheet = workbook.createSheet("性能异常数据");
-            // 设置表头样式
             CellStyle headerStyle = workbook.createCellStyle();
             Font headerFont = workbook.createFont();
             headerFont.setBold(true);
             headerStyle.setFont(headerFont);
-
-            // 写表头
             Row headerRow = sheet.createRow(0);
             String[] headers = { "ID", "时间戳", "CPU使用率(%)", "内存使用率(%)", "磁盘使用率(%)", "温度(°C)" };
             for (int i = 0; i < headers.length; i++) {
@@ -308,7 +231,6 @@ public class ExcelExporter {
                 cell.setCellValue(headers[i]);
                 cell.setCellStyle(headerStyle);
             }
-            // 查询并写入数据
             String sql = "SELECT * FROM performance_data";
             try (Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {
@@ -323,11 +245,9 @@ public class ExcelExporter {
                     row.createCell(5).setCellValue(rs.getDouble("temperature"));
                 }
             }
-            // 自动适应列宽
             for (int i = 0; i < headers.length; i++) {
                 sheet.autoSizeColumn(i);
             }
-            // 写入Excel文件
             try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
                 workbook.write(outputStream);
             }
@@ -340,9 +260,310 @@ public class ExcelExporter {
 
 ---
 
-## 二、界面与业务层（ui 包）
+### PerformanceData.java
 
-### 1. MainApp.java
+```java
+package logic;
+
+import java.time.LocalDateTime;
+
+public class PerformanceData {
+    private final LocalDateTime timestamp;
+    private final double cpuUsage;
+    private final double memoryUsage;
+    private final double diskUsage;
+    private final double temperature;
+    private final boolean isAbnormal;
+
+    public PerformanceData(LocalDateTime timestamp, double cpuUsage,
+            double memoryUsage, double diskUsage,
+            double temperature) {
+        this.timestamp = timestamp;
+        this.cpuUsage = cpuUsage;
+        this.memoryUsage = memoryUsage;
+        this.diskUsage = diskUsage;
+        this.temperature = temperature;
+        this.isAbnormal = checkAbnormal();
+    }
+
+    private boolean checkAbnormal() {
+        final double CPU_THRESHOLD = 90.0;
+        final double MEMORY_THRESHOLD = 85.0;
+        final double DISK_THRESHOLD = 95.0;
+        return cpuUsage > CPU_THRESHOLD ||
+                memoryUsage > MEMORY_THRESHOLD ||
+                diskUsage > DISK_THRESHOLD;
+    }
+
+    public LocalDateTime getTimestamp() { return timestamp; }
+    public double getCpuUsage() { return cpuUsage; }
+    public double getMemoryUsage() { return memoryUsage; }
+    public double getDiskUsage() { return diskUsage; }
+    public double getTemperature() { return temperature; }
+    public boolean isAbnormal() { return isAbnormal; }
+}
+```
+
+---
+
+### ConfigManager.java
+
+```java
+package logic;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
+
+/**
+ * 配置文件管理类，支持读取和保存项目配置
+ */
+public class ConfigManager {
+    private final Properties props;
+    private final String configFilePath;
+
+    public ConfigManager(String configFilePath) {
+        this.configFilePath = configFilePath;
+        this.props = new Properties();
+        load();
+    }
+
+    public String getConfig(String key, String defaultValue) {
+        return props.getProperty(key, defaultValue);
+    }
+
+    public void setConfig(String key, String value) {
+        props.setProperty(key, value);
+    }
+
+    public void save() {
+        try (FileOutputStream fos = new FileOutputStream(configFilePath)) {
+            props.store(fos, "Application Config");
+        } catch (IOException e) {
+            System.err.println("保存配置文件失败: " + e.getMessage());
+        }
+    }
+
+    public void load() {
+        try (FileInputStream fis = new FileInputStream(configFilePath)) {
+            props.load(fis);
+        } catch (IOException e) {
+            // 文件不存在等情况忽略
+        }
+    }
+}
+```
+
+---
+
+### LogHelper.java
+
+```java
+package logic;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * 日志工具类，支持多级日志控制台及文件输出
+ */
+public class LogHelper {
+    private String logFilePath;
+    private boolean enableFileLog;
+
+    public LogHelper() {
+        this.logFilePath = "app.log";
+        this.enableFileLog = false;
+    }
+
+    public LogHelper(String logFilePath, boolean enableFileLog) {
+        this.logFilePath = logFilePath;
+        this.enableFileLog = enableFileLog;
+    }
+
+    public void setLogFilePath(String path) { this.logFilePath = path; }
+    public String getLogFilePath() { return logFilePath; }
+    public void setEnableFileLog(boolean enable) { this.enableFileLog = enable; }
+    public boolean isEnableFileLog() { return enableFileLog; }
+
+    public void info(String message) { log("INFO", message); }
+    public void warn(String message) { log("WARN", message); }
+    public void error(String message) { log("ERROR", message); }
+    public void debug(String message) { log("DEBUG", message); }
+
+    public void log(String level, String message) {
+        String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String logMsg = String.format("[%s] [%s] %s", now, level, message);
+        System.out.println(logMsg);
+        if (enableFileLog) {
+            writeLogToFile(logMsg);
+        }
+    }
+
+    private void writeLogToFile(String logMsg) {
+        try (FileWriter fw = new FileWriter(logFilePath, true)) {
+            fw.write(logMsg + "\n");
+        } catch (IOException e) {
+            System.err.println("写入日志文件失败: " + e.getMessage());
+        }
+    }
+}
+```
+
+---
+
+### CpuInfoParser.java
+
+```java
+package logic;
+
+/**
+ * CPU型号字符串解析工具类
+ */
+public class CpuInfoParser {
+    public static String getBrand(String cpuModel) {
+        if (cpuModel == null)
+            return "";
+        String s = cpuModel.toLowerCase();
+        if (s.contains("intel"))
+            return "Intel";
+        if (s.contains("amd"))
+            return "AMD";
+        if (s.contains("apple"))
+            return "Apple";
+        return "Unknown";
+    }
+
+    public static String getSeries(String cpuModel) {
+        if (cpuModel == null)
+            return "";
+        if (cpuModel.contains("i7"))
+            return "i7";
+        if (cpuModel.contains("i5"))
+            return "i5";
+        if (cpuModel.contains("i3"))
+            return "i3";
+        if (cpuModel.contains("Ryzen"))
+            return "Ryzen";
+        return "Unknown";
+    }
+
+    public static int getCoreCount(String cpuModel) {
+        if (cpuModel == null)
+            return 0;
+        if (cpuModel.contains("i7"))
+            return 8;
+        if (cpuModel.contains("i5"))
+            return 6;
+        if (cpuModel.contains("i3"))
+            return 4;
+        if (cpuModel.contains("Ryzen 9"))
+            return 12;
+        if (cpuModel.contains("Ryzen 7"))
+            return 8;
+        if (cpuModel.contains("Ryzen 5"))
+            return 6;
+        return 4;
+    }
+}
+```
+
+---
+
+### FileUtils.java
+
+```java
+package logic;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+/**
+ * 文件操作工具类，提供常用文件相关方法
+ */
+public class FileUtils {
+    public static boolean exists(String path) {
+        if (path == null)
+            return false;
+        return new File(path).exists();
+    }
+
+    public static boolean delete(String path) {
+        if (path == null)
+            return false;
+        File file = new File(path);
+        if (!file.exists())
+            return false;
+        if (file.isDirectory()) {
+            for (File child : file.listFiles()) {
+                delete(child.getAbsolutePath());
+            }
+        }
+        return file.delete();
+    }
+
+    public static boolean copy(String src, String dest) {
+        if (src == null || dest == null)
+            return false;
+        File srcFile = new File(src);
+        if (!srcFile.exists() || srcFile.isDirectory())
+            return false;
+        try (FileInputStream fis = new FileInputStream(src);
+                FileOutputStream fos = new FileOutputStream(dest)) {
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = fis.read(buf)) != -1) {
+                fos.write(buf, 0, len);
+            }
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public static long size(String path) {
+        if (path == null)
+            return 0;
+        File file = new File(path);
+        if (!file.exists() || file.isDirectory())
+            return 0;
+        return file.length();
+    }
+
+    public static boolean createFile(String path) {
+        if (path == null)
+            return false;
+        File file = new File(path);
+        if (file.exists())
+            return false;
+        try {
+            return file.createNewFile();
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public static boolean createDir(String path) {
+        if (path == null)
+            return false;
+        File file = new File(path);
+        if (file.exists())
+            return false;
+        return file.mkdirs();
+    }
+}
+```
+
+---
+
+## ui 包（界面与控制器）
+
+### MainApp.java
 
 ```java
 package ui;
@@ -360,14 +581,11 @@ import java.time.LocalDateTime;
 public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        // 设置全局异常处理器
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             logException(e);
         });
-        
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/main_window.fxml"));
         Parent root = loader.load();
-        
         primaryStage.setTitle("电脑性能监视器");
         primaryStage.setScene(new Scene(root, 800, 700));
         primaryStage.show();
@@ -381,8 +599,7 @@ public class MainApp extends Application {
     public void stop() {
         System.exit(0);
     }
-    
-    // 记录异常日志到本地文件
+
     private static void logException(Throwable e) {
         try (FileWriter fw = new FileWriter("performance_monitor_error.log", true)) {
             fw.write(LocalDateTime.now() + ": Unhandled exception\n");
@@ -400,7 +617,7 @@ public class MainApp extends Application {
 
 ---
 
-### 2. MainController.java
+### MainController.java
 
 ```java
 package ui;
@@ -422,7 +639,6 @@ import logic.HardwareMonitor.HardwareInfo;
 import logic.PerformanceData;
 
 public class MainController {
-    // UI组件
     @FXML private Label cpuModelLabel;
     @FXML private Label diskModelLabel;
     @FXML private Label cpuUsageLabel;
@@ -435,7 +651,6 @@ public class MainController {
     @FXML private CheckMenuItem memoryMenuItem;
     @FXML private CheckMenuItem diskMenuItem;
 
-    // 监控与界面刷新相关
     private HardwareMonitor monitor;
     private BrandLogoManager logoManager;
     private AnimationTimer uiUpdateTimer;
@@ -452,14 +667,12 @@ public class MainController {
     @FXML
     public void initialize() {
         try {
-            initUsageChart(); // 初始化折线图
+            initUsageChart();
             monitor = new HardwareMonitor();
             logoManager = new BrandLogoManager();
-            displayHardwareInfo(); // 展示硬件信息
-            monitor.startMonitoring(2); // 2秒采样
-            setupUIUpdateTimer(); // 定时刷新UI
-
-            // 监听窗口关闭事件
+            displayHardwareInfo();
+            monitor.startMonitoring(2);
+            setupUIUpdateTimer();
             Stage stage = (Stage) cpuUsageLabel.getScene().getWindow();
             stage.setOnCloseRequest(this::handleWindowClose);
         } catch (Exception e) {
@@ -468,7 +681,6 @@ public class MainController {
         }
     }
 
-    // 展示硬件信息
     private void displayHardwareInfo() {
         try {
             HardwareInfo info = monitor.getHardwareInfo();
@@ -484,13 +696,12 @@ public class MainController {
         }
     }
 
-    // 定时刷新UI
     private void setupUIUpdateTimer() {
         uiUpdateTimer = new AnimationTimer() {
             private long lastUpdate = 0;
             @Override
             public void handle(long now) {
-                if (now - lastUpdate >= 1_000_000_000L) { // 每秒刷新
+                if (now - lastUpdate >= 1_000_000_000L) {
                     updateUIWithRealData();
                     lastUpdate = now;
                 }
@@ -506,14 +717,12 @@ public class MainController {
         }
     }
 
-    // 更新UI显示
     public void updateUI(PerformanceData data) {
         cpuUsageLabel.setText(String.format("%.1f%%", data.getCpuUsage()));
         memoryUsageLabel.setText(String.format("%.1f%%", data.getMemoryUsage()));
         diskUsageLabel.setText(String.format("%.1f%%", data.getDiskUsage()));
         temperatureLabel.setText(String.format("%.1f°C", data.getTemperature()));
 
-        // 异常状态高亮
         if (data.isAbnormal()) {
             cpuUsageLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
             memoryUsageLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
@@ -527,7 +736,6 @@ public class MainController {
         updateChart(data);
     }
 
-    // 导出Excel
     @FXML
     private void handleExportExcel() {
         try {
@@ -552,7 +760,6 @@ public class MainController {
         if (uiUpdateTimer != null) uiUpdateTimer.stop();
     }
 
-    // 折线图初始化
     @SuppressWarnings("unchecked")
     private void initUsageChart() {
         usageChart.getData().clear();
@@ -566,7 +773,6 @@ public class MainController {
         updateChartVisibility();
     }
 
-    // 图表可见性切换
     private void updateChartVisibility() {
         if (cpuSeries != null) cpuSeries.getNode().setVisible(cpuMenuItem.isSelected());
         if (memorySeries != null) memorySeries.getNode().setVisible(memoryMenuItem.isSelected());
@@ -578,7 +784,6 @@ public class MainController {
         updateChartVisibility();
     }
 
-    // 清空图表
     @FXML
     private void handleResetChart() {
         if (cpuSeries != null) cpuSeries.getData().clear();
@@ -587,26 +792,22 @@ public class MainController {
         timeCounter = 0;
     }
 
-    // 关闭窗口
     private void handleWindowClose(WindowEvent event) {
         stopMonitoring();
         Platform.exit();
         System.exit(0);
     }
 
-    // 更新折线图
     private void updateChart(PerformanceData data) {
         if (cpuSeries == null || memorySeries == null || diskSeries == null) return;
         cpuSeries.getData().add(new XYChart.Data<>(timeCounter, data.getCpuUsage()));
         memorySeries.getData().add(new XYChart.Data<>(timeCounter, data.getMemoryUsage()));
         diskSeries.getData().add(new XYChart.Data<>(timeCounter, data.getDiskUsage()));
 
-        // 保持固定长度
         if (cpuSeries.getData().size() > MAX_DATA_POINTS) cpuSeries.getData().remove(0);
         if (memorySeries.getData().size() > MAX_DATA_POINTS) memorySeries.getData().remove(0);
         if (diskSeries.getData().size() > MAX_DATA_POINTS) diskSeries.getData().remove(0);
 
-        // 更新X轴
         if (usageChart.getXAxis() instanceof NumberAxis) {
             NumberAxis xAxis = (NumberAxis) usageChart.getXAxis();
             xAxis.setLowerBound(Math.max(0, timeCounter - MAX_DATA_POINTS));
@@ -617,7 +818,6 @@ public class MainController {
         updateChartColors(data);
     }
 
-    // 根据阈值设置折线颜色
     private void updateChartColors(PerformanceData data) {
         if (data.getCpuUsage() > CPU_THRESHOLD)
             cpuSeries.getNode().setStyle("-fx-stroke: red;");
@@ -637,7 +837,7 @@ public class MainController {
 
 ---
 
-### 3. BrandLogoManager.java
+### BrandLogoManager.java
 
 ```java
 package ui;
@@ -648,10 +848,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BrandLogoManager {
-    private static final Map<String, String> BRAND_MAPPING = new HashMap<>(); // 品牌映射
-    private static final Map<String, Image> LOGO_CACHE = new HashMap<>();     // logo缓存
+    private static final Map<String, String> BRAND_MAPPING = new HashMap<>();
+    private static final Map<String, Image> LOGO_CACHE = new HashMap<>();
     static {
-        // 品牌关键字与资源文件名映射
         BRAND_MAPPING.put("intel", "intel");
         BRAND_MAPPING.put("amd", "amd");
         BRAND_MAPPING.put("samsung", "samsung");
@@ -660,7 +859,6 @@ public class BrandLogoManager {
         BRAND_MAPPING.put("kingston", "kingston");
     }
 
-    // 根据型号自动识别品牌
     public String detectBrandFromModel(String model) {
         if (model == null)
             return "default";
@@ -673,13 +871,10 @@ public class BrandLogoManager {
         return "default";
     }
 
-    // 获取品牌logo
     public Image getBrandLogo(String brand) {
         if (LOGO_CACHE.containsKey(brand))
             return LOGO_CACHE.get(brand);
-        
         try {
-            // 加载资源（打包后也能访问）
             URL resourceUrl = getClass().getResource("/img/" + brand + "_logo.png");
             if (resourceUrl == null) {
                 throw new Exception("品牌Logo资源未找到: " + brand);
@@ -689,7 +884,6 @@ public class BrandLogoManager {
             return logo;
         } catch (Exception e) {
             System.err.println("无法加载品牌Logo: " + brand + ", 使用默认Logo. 错误: " + e.getMessage());
-            // 加载默认logo
             URL defaultUrl = getClass().getResource("/img/default_logo.png");
             if (defaultUrl != null) {
                 Image defaultLogo = new Image(defaultUrl.toExternalForm());
@@ -706,81 +900,4 @@ public class BrandLogoManager {
 
 ---
 
-## 三、FXML 界面布局与注释
-
-> 下面是主界面 `main_window.fxml` 的完整结构和详细中文注释，帮助你理解每一个控件和区域的布局与用途。
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.chart.*?>
-<!--
-  主窗口采用 BorderPane 布局，上中下三大部分：
-  top    : 品牌Logo及硬件信息
-  center : 实时数据与曲线图
-  bottom : 操作按钮与显示项菜单
--->
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="ui.MainController">
-    <top>
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <!-- 品牌Logo，自动检测品牌后加载对应图片 -->
-            <ImageView fx:id="brandLogoView" fitHeight="56" fitWidth="56"/>
-            <VBox>
-                <!-- CPU型号显示 -->
-                <Label fx:id="cpuModelLabel" style="-fx-font-size: 18px;"/>
-                <!-- 磁盘型号显示 -->
-                <Label fx:id="diskModelLabel" style="-fx-font-size: 14px;"/>
-            </VBox>
-        </HBox>
-    </top>
-    <center>
-        <VBox spacing="12">
-            <HBox spacing="18" alignment="CENTER">
-                <!-- 实时数值区，每项数据用一个Label动态刷新 -->
-                <Label text="CPU:"/>
-                <Label fx:id="cpuUsageLabel" style="-fx-font-size: 20px;"/>
-                <Label text="内存:"/>
-                <Label fx:id="memoryUsageLabel" style="-fx-font-size: 20px;"/>
-                <Label text="磁盘:"/>
-                <Label fx:id="diskUsageLabel" style="-fx-font-size: 20px;"/>
-                <Label text="温度:"/>
-                <Label fx:id="temperatureLabel" style="-fx-font-size: 20px;"/>
-            </HBox>
-            <!-- 使用率折线图，动态刷新 -->
-            <LineChart fx:id="usageChart" animated="false">
-                <xAxis>
-                    <NumberAxis label="时间" />
-                </xAxis>
-                <yAxis>
-                    <NumberAxis label="使用率(%)" lowerBound="0" upperBound="100"/>
-                </yAxis>
-            </LineChart>
-        </VBox>
-    </center>
-    <bottom>
-        <HBox alignment="CENTER" spacing="10">
-            <!-- 导出Excel按钮 -->
-            <Button text="导出异常数据" onAction="#handleExportExcel"/>
-            <!-- 曲线重置按钮 -->
-            <Button text="重置曲线" onAction="#handleResetChart"/>
-            <!-- 显示项菜单（可选择是否显示CPU/内存/磁盘曲线） -->
-            <MenuButton text="显示项">
-                <CheckMenuItem fx:id="cpuMenuItem" text="CPU" selected="true" onAction="#handleHardwareSelection"/>
-                <CheckMenuItem fx:id="memoryMenuItem" text="内存" selected="true" onAction="#handleHardwareSelection"/>
-                <CheckMenuItem fx:id="diskMenuItem" text="磁盘" selected="true" onAction="#handleHardwareSelection"/>
-            </MenuButton>
-        </HBox>
-    </bottom>
-</BorderPane>
-```
-
-**界面结构说明：**
-- 顶部：LOGO+硬件型号（自动识别品牌）
-- 中部：实时数值展示+折线图（动态刷新，异常高亮）
-- 底部：导出、重置、显示项切换（增强交互性）
-
----
-
-> 如需查看更多源码、资源图片或实际运行效果，请访问 [GitHub仓库](https://github.com/LXZ-rgb/Performance-Monitor)
+> 以上即为 `performance-monitor/src/main/java` 目录下所有主 Java 文件的完整源码。若有遗漏、更新或需补充其它模块，请告知。
