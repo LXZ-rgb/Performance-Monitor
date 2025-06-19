@@ -1,105 +1,71 @@
 ---
 layout: page
-title: logic 包源码与结构详解
+title: FXML 文件展示与界面说明
 ---
 
-# 🧩 logic 包 — 数据、工具与业务逻辑
+# 🖼️ FXML 文件 — JavaFX 界面布局
 
-> 本页完整展示 `logic` 包下所有 Java 源码（含中文注释和模块说明），并按功能分组解读。
+> 本页展示所有 JavaFX FXML 布局文件源码，并附以功能结构说明。  
+> 这些文件位于 `performance-monitor/src/main/resources/ui/`。
 
 ---
 
 ## 目录
 
-- [DatabaseHandler.java](#databasehandlerjava-数据库操作)
-- [HardwareMonitor.java](#hardwaremonitorjava-硬件监控)
-- [ExcelExporter.java](#excelexporterjava-excel导出)
-- [PerformanceData.java](#performancedatajava-性能数据模型)
-- [ConfigManager.java](#configmanagerjava-配置管理)
-- [LogHelper.java](#loghelperjava-日志工具)
-- [CpuInfoParser.java](#cpuinfoparserjava-cpu型号解析)
-- [FileUtils.java](#fileutilsjava-文件工具)
+- [main_window.fxml](#main_windowfxml-主窗口界面)
 
 ---
 
-## DatabaseHandler.java （数据库操作）
+## main_window.fxml （主窗口界面）
 
-> **作用**：管理 SQLite 数据库连接、建表、数据存储与关闭。所有性能异常数据均由此管理持久化。
+> **作用说明**：定义主监控窗口的布局，包括品牌Logo、性能曲线图、实时数据展示等。
 
-```java
-// ...（完整源码同主 code.md 文件，省略重复内容）
+```xml name=performance-monitor/src/main/resources/ui/main_window.fxml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.chart.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="ui.MainController">
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 12;">
+            <ImageView fx:id="brandLogoView" fitHeight="48" fitWidth="48"/>
+            <VBox>
+                <Label fx:id="cpuModelLabel" text="CPU 型号"/>
+                <Label fx:id="diskModelLabel" text="磁盘型号"/>
+            </VBox>
+        </HBox>
+    </top>
+    <center>
+        <LineChart fx:id="usageChart" title="性能变化曲线">
+            <xAxis>
+                <NumberAxis label="时间(s)"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis label="使用率(%)"/>
+            </yAxis>
+        </LineChart>
+    </center>
+    <bottom>
+        <HBox spacing="20" alignment="CENTER" style="-fx-padding: 12;">
+            <Label text="CPU：" />
+            <Label fx:id="cpuUsageLabel" text="0%" />
+            <Label text="内存：" />
+            <Label fx:id="memoryUsageLabel" text="0%" />
+            <Label text="磁盘：" />
+            <Label fx:id="diskUsageLabel" text="0%" />
+            <Label text="温度：" />
+            <Label fx:id="temperatureLabel" text="0°C" />
+            <Button text="导出Excel" onAction="#handleExportExcel"/>
+        </HBox>
+    </bottom>
+</BorderPane>
 ```
 
 ---
 
-## HardwareMonitor.java （硬件监控）
 
-> **作用**：基于 OSHI 库采集 CPU、内存、磁盘等实时数据，并决定是否需要持久化异常。
-
-```java
-// ...（完整源码同主 code.md 文件，省略重复内容）
-```
-
----
-
-## ExcelExporter.java （Excel导出）
-
-> **作用**：将数据库中的异常性能数据导出为 Excel 文件，方便后期分析与答辩展示。
-
-```java
-// ...（完整源码同主 code.md 文件，省略重复内容）
-```
-
----
-
-## PerformanceData.java （性能数据模型）
-
-> **作用**：封装每次采集的数据项，并内置判断是否为异常状态。
-
-```java
-// ...（完整源码同主 code.md 文件，省略重复内容）
-```
-
----
-
-## ConfigManager.java （配置管理）
-
-> **作用**：负责加载、保存项目本地配置（如采集间隔、界面主题等）。
-
-```java
-// ...（完整源码同主 code.md 文件，省略重复内容）
-```
-
----
-
-## LogHelper.java （日志工具）
-
-> **作用**：支持日志输出到控制台和日志文件，便于调试和追踪问题。
-
-```java
-// ...（完整源码同主 code.md 文件，省略重复内容）
-```
-
----
-
-## CpuInfoParser.java （CPU型号解析）
-
-> **作用**：辅助解析 CPU 型号字符串，判断品牌、系列及核心数。
-
-```java
-// ...（完整源码同主 code.md 文件，省略重复内容）
-```
-
----
-
-## FileUtils.java （文件工具）
-
-> **作用**：提供常用的文件操作方法（如检测、创建、删除、复制等）。
-
-```java
-// ...（完整源码同主 code.md 文件，省略重复内容）
-```
-
----
 
 [返回主导航页](code.md)
