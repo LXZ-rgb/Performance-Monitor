@@ -24,7 +24,6 @@
   - 支持 Intel / AMD / Samsung / WD / Seagate / Kingston 等主流品牌
 - 🖼️ <b>动态 Logo 加载：</b>
   - 自动加载匹配的品牌 Logo
-  - 内置缓存机制提升性能
   - 优雅的失败处理（默认 Logo）
 - 📈 <b>数据可视化与异常监控：</b>
   - 实时折线图展示 CPU / 内存 / 磁盘 / 温度等信息
