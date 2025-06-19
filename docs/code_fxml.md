@@ -20,9 +20,10 @@ title: FXML 文件展示与界面说明
 
 > **作用说明**：定义主监控窗口的布局，包括品牌Logo、性能曲线图、实时数据展示等。
 
-```xml name=performance-monitor/src/main/resources/ui/main_window.fxml
-<?xml version="1.0" encoding="UTF-8"?>
+> ![主界面预览](../assets/main_window_preview.png) <!-- 可换成你实际的界面截图 -->
 
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.image.*?>
@@ -66,6 +67,6 @@ title: FXML 文件展示与界面说明
 
 ---
 
-
-
-[返回主导航页](code.md)
+<div align="center" style="margin-top:2em;">
+  <a href="code.md"><b>返回主导航页</b></a>
+</div>
