@@ -47,11 +47,7 @@ performance-monitor/
 │           └── resources/
 │               └── ui/           # FXML布局文件
 │               └── img/          # 图片资源
-└── docs/
-    └── code.md                   # 本导航页
-    └── code_logic.md             # logic包源码页面
-    └── code_ui.md                # ui包源码页面
-    └── code_fxml.md              # FXML文件展示页面
+
 ```
 
 ---
