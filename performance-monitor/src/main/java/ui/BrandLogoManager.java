@@ -1,61 +1,47 @@
-package ui;
+package ui; // 指定包名为ui，负责界面相关的管理类
 
-import javafx.scene.image.Image;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import javafx.scene.image.Image; // 导入JavaFX的Image类，用于显示品牌Logo
+import java.util.HashMap; // 导入HashMap用于存储品牌与Logo的映射
+import java.util.Map; // 导入Map接口
 
-public class BrandLogoManager {
-    private static final Map<String, String> BRAND_MAPPING = new HashMap<>();
-    private static final Map<String, Image> LOGO_CACHE = new HashMap<>();
-    static {
-        BRAND_MAPPING.put("intel", "intel");
-        BRAND_MAPPING.put("amd", "amd");
-        BRAND_MAPPING.put("samsung", "samsung");
-        BRAND_MAPPING.put("western digital", "wd");
-        BRAND_MAPPING.put("seagate", "seagate");
-        BRAND_MAPPING.put("kingston", "kingston");
+public class BrandLogoManager { // 品牌Logo管理器，根据硬件型号推断品牌并提供Logo图片
+
+    private final Map<String, Image> logoMap; // 品牌名称到Logo图片的映射表
+
+    public BrandLogoManager() {
+        logoMap = new HashMap<>(); // 初始化映射表
+        // 预加载常见品牌Logo
+        logoMap.put("Intel", loadLogo("/ui/logo/intel.png"));   // Intel logo
+        logoMap.put("AMD", loadLogo("/ui/logo/amd.png"));       // AMD logo
+        logoMap.put("Samsung", loadLogo("/ui/logo/samsung.png"));// Samsung logo
+        logoMap.put("Kingston", loadLogo("/ui/logo/kingston.png"));// Kingston logo
+        // ... 可以根据实际需求继续扩展品牌和logo
     }
 
+    // 根据型号字符串猜测品牌（简单字符串包含判断，可按需拓展更复杂判断）
     public String detectBrandFromModel(String model) {
-        if (model == null)
-            return "default";
-        String lowerModel = model.toLowerCase();
-        for (Map.Entry<String, String> entry : BRAND_MAPPING.entrySet()) {
-            if (lowerModel.contains(entry.getKey())) {
-                return entry.getValue();
-            }
-        }
-        return "default";
+        if (model == null) return "";
+        model = model.toLowerCase(); // 转为小写便于判断
+        if (model.contains("intel")) return "Intel";
+        if (model.contains("amd")) return "AMD";
+        if (model.contains("samsung")) return "Samsung";
+        if (model.contains("kingston")) return "Kingston";
+        // ... 可添加更多品牌判断
+        return ""; // 未知品牌
     }
 
+    // 获取品牌Logo图片，若找不到返回null
     public Image getBrandLogo(String brand) {
-        if (LOGO_CACHE.containsKey(brand))
-            return LOGO_CACHE.get(brand);
-        
+        return logoMap.getOrDefault(brand, null);
+    }
+
+    // 加载Logo图片资源
+    private Image loadLogo(String path) {
         try {
-            // 使用URL加载资源，确保在打包后也能正确访问
-            URL resourceUrl = getClass().getResource("/img/" + brand + "_logo.png");
-            if (resourceUrl == null) {
-                throw new Exception("品牌Logo资源未找到: " + brand);
-            }
-            
-            Image logo = new Image(resourceUrl.toExternalForm());
-            LOGO_CACHE.put(brand, logo);
-            return logo;
+            return new Image(getClass().getResourceAsStream(path));
         } catch (Exception e) {
-            System.err.println("无法加载品牌Logo: " + brand + ", 使用默认Logo. 错误: " + e.getMessage());
-            
-            // 加载默认logo
-            URL defaultUrl = getClass().getResource("/img/default_logo.png");
-            if (defaultUrl != null) {
-                Image defaultLogo = new Image(defaultUrl.toExternalForm());
-                LOGO_CACHE.put("default", defaultLogo);
-                return defaultLogo;
-            } else {
-                System.err.println("严重错误: 默认Logo也未找到!");
-                return null;
-            }
+            System.err.println("Logo加载失败: " + path);
+            return null;
         }
     }
 }
